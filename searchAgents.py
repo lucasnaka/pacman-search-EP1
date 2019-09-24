@@ -262,6 +262,17 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+def p_normHeuristic(position, problem, info={}):
+    "The p-norm is related to the generalized mean or power mean."
+    xy1 = position
+    xy2 = problem.goal
+    return ( (xy1[0] - xy2[0]) ** p + (xy1[1] - xy2[1]) ** p ) ** 1/p
+
+def maximum_normHeuristic(position, problem, info={}):
+    xy1 = position
+    xy2 = problem.goal
+    return max(abs(xy1[0] - xy2[0]), abs(xy1[1] - xy2[1]))
+
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################

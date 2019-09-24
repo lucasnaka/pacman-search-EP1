@@ -105,11 +105,46 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
-
+    
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+
+    # Inicializacao
+    initial_state = problem.getStartState()
+    initial_path_cost = 0
+    initial_objective_cost = heuristic(initial_state,problem)
+    priority_state_queue = util.PriorityQueue() # Estados ordenados com relacao ao custo de solucao estimado
+    visited_states = [] # Fronteira
+
+    # Adicionamos na lista de prioridades o nosso estado inicial
+    priority_state_queue.push((initial_state, [], 0), initial_path_cost + initial_objective_cost)
+    # Partimos a busca do estado inicial:
+    (state, directions_to_goal, path_cost) = priority_state_queue.pop()
+    # Adicionamos o estado inicial a nossa fronteira:
+    visited_states.append((state, path_cost + initial_objective_cost))
+
+    while not problem.isGoalState(state): # O problema so para quando um estado solucao e expandido
+        successors = problem.getSuccessors(state) # Pegar todos os sucessores de um estado
+        # successors contem o seu estado, sua acao (no nosso caso, uma direcao) 
+        # e o custo da acao para passar do estado anterior para este estado sucessor
+        for (successor_state, successor_action, successor_step_cost) in successors:
+            already_expanded = False
+            actual_cost = path_cost + successor_step_cost # Custo total do no inicial ate o no atual atraves desse caminho
+            for (visitedState,visitedToCost) in visited_states:
+                # Se o estado ja se encontra na fronteira com um custo menor do que o custo atual, nao fazer nada
+                if (successor_state == visitedState) and (actual_cost >= visitedToCost): 
+                    already_expanded = True
+                    break
+
+            # Caso contrario, adiciona-lo na fronteira e a lista de prioridade de estados
+            if not already_expanded:
+                priority_state_queue.push((successor_state,directions_to_goal+[successor_action],actual_cost), actual_cost+heuristic(successor_state,problem)) 
+                visited_states.append((successor_state,actual_cost))
+
+        # Reiniciar o looping com o estado de menor custo da fronteira
+        (state,directions_to_goal,path_cost) = priority_state_queue.pop()
+
+    return directions_to_goal
 
 
 # Abbreviations
